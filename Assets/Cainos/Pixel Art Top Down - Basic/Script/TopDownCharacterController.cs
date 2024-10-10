@@ -13,6 +13,9 @@ namespace Cainos.PixelArtTopDown_Basic
         public GameObject attackPrefabLeft;
         public GameObject attackPrefabRight;
 
+        // プレイヤーの初期HPを設定
+        public int playerHP = 5;
+
         private void Start()
         {
             //この方法では取得できない
@@ -55,17 +58,19 @@ namespace Cainos.PixelArtTopDown_Basic
 
             //ベクトルを正規化する（0または1）
             dir.Normalize();
-            
+
             //animator.SetBool("IsMoving", dir.magnitude > 0);
 
             //Parametar名が違うので改造
             animator.SetBool("Run", dir.magnitude > 0);
 
+            //移動させる
             GetComponent<Rigidbody2D>().velocity = speed * dir;
 
             //スペースキーで攻撃
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                //攻撃
                 animator.SetTrigger("Attack");
 
                 //向きを調べる
@@ -74,14 +79,34 @@ namespace Cainos.PixelArtTopDown_Basic
                     //左向き
                     GameObject attack = Instantiate(attackPrefabLeft);
                     //座標のコピー（このスクリプトの位置）
-                    attack.transform.position = this.transform.position;
+                    attack.transform.position = this.transform.position + new Vector3(-0.3f, 0.5f, 0.0f);
                 }
                 else
                 {
                     //右向き
                     GameObject attack = Instantiate(attackPrefabRight);
                     //座標のコピー（このスクリプトの位置）
-                    attack.transform.position = this.transform.position;
+                    attack.transform.position = this.transform.position + new Vector3(0.3f, 0.5f, 0.0f);
+                }
+            }
+        }
+
+        // 敵と衝突した時の処理
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            // 敵にぶつかったとき
+            if (collision.gameObject.CompareTag("EnemyTag"))
+            {
+                playerHP -= 1;  // HPを1減らす
+
+                // HPが0になったらプレイヤーが死亡
+                if (playerHP <= 0)
+                {
+                    //死亡アニメーションの再生
+                    animator.SetTrigger("Death");
+
+                    // プレイヤーオブジェクトを廃棄
+                    Destroy(gameObject, 1.0f);
                 }
             }
         }

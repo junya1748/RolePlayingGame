@@ -10,16 +10,22 @@ public class AttackControllerRight : MonoBehaviour
     void Start()
     {
         rd = GetComponent<Rigidbody2D>();   //Rigidbodyコンポーネント取得
+
+        //ｎ秒後に破棄　※残ってしまうので
+        Destroy(gameObject, 0.2f);
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))     //攻撃開始時(Spaceキーを押すと攻撃開始)
-            rd.velocity = new Vector2(attspeed, 0); //スピードをつけて攻撃オブジェクトを移動
+        rd.velocity = new Vector2(attspeed, 0); //スピードをつけて攻撃オブジェクトを移動
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        Destroy(gameObject);    //攻撃オブジェクトの破棄
+        //プレイヤー以外
+        if (other.gameObject.tag != "Player")
+        {
+            Destroy(gameObject);    //攻撃オブジェクトの破棄
+        }
     }
 }
